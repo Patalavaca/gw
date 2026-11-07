@@ -1,15 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Groundwork">
 <meta name="theme-color" content="#E65100">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAEU0lEQVR4nO3dwZEUOxQFUSxigScYhLu4AWsigJnuUilfqrLjbInJku7U33yaLz+/f0nexhdEjS+IGl8QNb4ganxB1PiCqPEFUeMLosYXRI0viBpfEDW+IGp8QdT4gqjxBVHjC6LGF0SNL4gaXxA1viBqfEHU+IKo8QVR4wuixhdEjS+IGl8QNb4ganxB1PiCqPEFUeMLosYXRI0viBpfEDW+IGp8QdT4gqjxBVHjC6LGF0SNL4gaXxA1viBqfEHU+IKo8QVR4wuixhdEjS+IGl8wx69XPnjtEHzBfi8N5dUP/nSb8QV73DqaJ4+JL7gPMpp/ffDTuAlfsBw9lQ8++PmsxResQg/j5Q9+YkvwBddtvtfNP244vuBt025uWs8efMHOq6pwOb7g7oup+VZ8wU03gdee1/9XfMHTjv6kZ3EM6JizPvK5+ILjj/jsZ+QLTj3ZhzwpX/D2meKRPfLQAY06yq8/vj3zwT+JL3j1ENf+uK8/vl2nPoGL+ILNZ7dkMXfvSbQhvmDPqW3YzdolWTbEF9x6XshuVi1JsSG+4MOTUk/n7hnhdzd9PW+cET6UtTMa/h6aPqCTpvP2jBrQ7UeDD+LuGY3dUOtpQycO6CHrWbihxw1oye8TfvebNzTwJTRxQE9bz6oNPWhA13+T8PumNjTtJTRrQK3n+oYaUANqQPc8PH6vczb03AH958kb0JIBbd7QoAF9+GfxS50zoDkvIc2A8BudtqEG1IAaUANqQA1orAbUgBpQA2pADUiqAS1+bPxG56ynAfUSujSgK8foHlD/Fbt7QJtv0zSg52zo1jNsQOdrQG8+fBvq/0i8uqHP/HH8jsH1jHr9TBzQkze05+hOGFB/L+y99Ux7/Qwd0AM3tPPQDhlQfzf+1fUMfP3MHdBzNrT/uM4ZUBuyr4cfUN9Qpl6PYEB9R+Ly8zntQH1L6/7DOW1AfU/0zjM5c0B9U71xPbMG1L+VsfMcVuEL2LMbshjwBC7iC944wf69sDn4gmOO8pmPzBdcOdCZZ/qoJ+ULTj3ZhzwjX3D8EZ/9XHzBwrNWnPhJz6IZ0BlHb+//K77gvjsYchPG5s/jC/ZcyeaLmV+4Cl+w/5JuuqppPXvwBfjNvXqRm3/ccHzBKmvvdcMHP7El+ILl6GF88MHPZy2+4D70VP744KdxE75gj0ZzE75gv0azEF8wR0N5A18QNb4ganxB1PiCqPEFUeMLosYXRI0viBpfEDW+IGp8QdT4gqjxBVHjC6LGF0SNL4gaXxA1viBqfEHU+IKo8QVR4wuixhdEjS+IGl8QNb4ganxB1PiCqPEFUeMLosYXRI0viBpfEDW+IGp8QdT4gqjxBVHjC6LGF0SNL4gaXxA1viBqfEHU+IKo8QVR4wuixhdEjS+IGl8QNb4ganxB1PiCqPEFUeMLosYXRI0viBpfEDW+IGp8QdT4gqj9Bqg6bRq51UU2AAAAAElFTkSuQmCC">
+<script>
+(function(){
+  var ic="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAEU0lEQVR4nO3dwZEUOxQFUSxigScYhLu4AWsigJnuUilfqrLjbInJku7U33yaLz+/f0nexhdEjS+IGl8QNb4ganxB1PiCqPEFUeMLosYXRI0viBpfEDW+IGp8QdT4gqjxBVHjC6LGF0SNL4gaXxA1viBqfEHU+IKo8QVR4wuixhdEjS+IGl8QNb4ganxB1PiCqPEFUeMLosYXRI0viBpfEDW+IGp8QdT4gqjxBVHjC6LGF0SNL4gaXxA1viBqfEHU+IKo8QVR4wuixhdEjS+IGl8wx69XPnjtEHzBfi8N5dUP/nSb8QV73DqaJ4+JL7gPMpp/ffDTuAlfsBw9lQ8++PmsxResQg/j5Q9+YkvwBddtvtfNP244vuBt025uWs8efMHOq6pwOb7g7oup+VZ8wU03gdee1/9XfMHTjv6kZ3EM6JizPvK5+ILjj/jsZ+QLTj3ZhzwpX/D2meKRPfLQAY06yq8/vj3zwT+JL3j1ENf+uK8/vl2nPoGL+ILNZ7dkMXfvSbQhvmDPqW3YzdolWTbEF9x6XshuVi1JsSG+4MOTUk/n7hnhdzd9PW+cET6UtTMa/h6aPqCTpvP2jBrQ7UeDD+LuGY3dUOtpQycO6CHrWbihxw1oye8TfvebNzTwJTRxQE9bz6oNPWhA13+T8PumNjTtJTRrQK3n+oYaUANqQPc8PH6vczb03AH958kb0JIBbd7QoAF9+GfxS50zoDkvIc2A8BudtqEG1IAaUANqQA1orAbUgBpQA2pADUiqAS1+bPxG56ynAfUSujSgK8foHlD/Fbt7QJtv0zSg52zo1jNsQOdrQG8+fBvq/0i8uqHP/HH8jsH1jHr9TBzQkze05+hOGFB/L+y99Ux7/Qwd0AM3tPPQDhlQfzf+1fUMfP3MHdBzNrT/uM4ZUBuyr4cfUN9Qpl6PYEB9R+Ly8zntQH1L6/7DOW1AfU/0zjM5c0B9U71xPbMG1L+VsfMcVuEL2LMbshjwBC7iC944wf69sDn4gmOO8pmPzBdcOdCZZ/qoJ+ULTj3ZhzwjX3D8EZ/9XHzBwrNWnPhJz6IZ0BlHb+//K77gvjsYchPG5s/jC/ZcyeaLmV+4Cl+w/5JuuqppPXvwBfjNvXqRm3/ccHzBKmvvdcMHP7El+ILl6GF88MHPZy2+4D70VP744KdxE75gj0ZzE75gv0azEF8wR0N5A18QNb4ganxB1PiCqPEFUeMLosYXRI0viBpfEDW+IGp8QdT4gqjxBVHjC6LGF0SNL4gaXxA1viBqfEHU+IKo8QVR4wuixhdEjS+IGl8QNb4ganxB1PiCqPEFUeMLosYXRI0viBpfEDW+IGp8QdT4gqjxBVHjC6LGF0SNL4gaXxA1viBqfEHU+IKo8QVR4wuixhdEjS+IGl8QNb4ganxB1PiCqPEFUeMLosYXRI0viBpfEDW+IGp8QdT4gqj9Bqg6bRq51UU2AAAAAElFTkSuQmCC";
+  var m='{"name":"Groundwork","short_name":"Groundwork","start_url":".","display":"standalone","background_color":"#0D0D0D","theme_color":"#E65100","icons":[{"src":"'+ic+'","sizes":"192x192","type":"image/png"}]}';
+  var b=new Blob([m],{type:"application/json"});
+  var l=document.createElement("link");
+  l.rel="manifest";l.href=URL.createObjectURL(b);
+  document.head.appendChild(l);
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Groundwork</title>
-<link rel="icon" type="image/png" href="icon.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0D0D0D;--surface:#161616;--surface2:#1E1E1E;--surface3:#252525;--orange:#E65100;--orange-light:#FF8F00;--orange-glow:rgba(230,81,0,.25);--gold:#FFD55A;--green:#4CAF50;--green-dark:#2E7D32;--red:#E53935;--red-dark:#B71C1C;--teal:#4DB6AC;--text:rgba(255,255,255,.87);--text2:rgba(255,255,255,.65);--text3:rgba(255,255,255,.45);--font-head:'Playfair Display',serif;--font-body:'Crimson Pro',serif;--radius:12px;--radius-sm:8px}
@@ -1323,6 +1333,7 @@ function init(){
 }
 
 init();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
 </script>
 </body>
 </html>
