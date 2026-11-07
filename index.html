@@ -221,7 +221,10 @@ h1,h2,h3{font-family:var(--font-head);font-weight:700}
       <h3>This Evening (max 3)</h3>
       <div class="beer-evening-dots" id="beer-evening-dots"></div>
     </div>
-    <button class="beer-add-btn" id="beer-add-btn" onclick="addBeer()">🍺 Add AF Beer</button>
+    <div style="display:flex;gap:10px;margin:16px 0;justify-content:center">
+      <button class="beer-add-btn" id="beer-remove-btn" onclick="removeBeer()" style="flex:0;padding:14px 18px;margin:0;background:var(--surface2);color:var(--text2)">−</button>
+      <button class="beer-add-btn" id="beer-add-btn" onclick="addBeer()" style="flex:1;margin:0">🍺 Add AF Beer</button>
+    </div>
     <div class="section-header">This Week</div>
     <div id="beer-week-log"></div>
   </div>
@@ -801,8 +804,9 @@ function renderBeerTab(){
   }
   document.getElementById('beer-evening-dots').innerHTML=evHTML;
 
-  // Warning
+  // Button states
   const btn=document.getElementById('beer-add-btn');
+  const rmBtn=document.getElementById('beer-remove-btn');
   if(weekCount>=7){
     btn.disabled=true;btn.textContent='Weekly limit reached';
   }else if(eveningCount>=3){
@@ -810,15 +814,28 @@ function renderBeerTab(){
   }else{
     btn.disabled=false;btn.textContent='🍺 Add AF Beer';
   }
+  rmBtn.disabled=todayBeers.length===0;
+  rmBtn.style.opacity=todayBeers.length===0?'.3':'1';
 
-  // Week log
+  // Week log — tappable for past days
   const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   let logHTML='';
   for(let i=0;i<7;i++){
     const d=new Date(monday.getTime()+i*86400000);
     const dk=dateKey(d);
     const count=data.beerLog.filter(b=>b.date===dk).length;
-    logHTML+=`<div class="beer-day-row"><div class="beer-day-name">${days[i]}</div><div class="beer-day-icons">${'🍺'.repeat(count)||'—'}</div></div>`;
+    const isFuture=dk>today;
+    const isToday=dk===today;
+    const btnStyle='border:none;background:var(--surface2);color:var(--text2);width:28px;height:28px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center';
+    const editBtns=isFuture?'':`<div style="display:flex;gap:6px;margin-left:auto">
+      ${count>0?`<button onclick="removeBeerFromDay('${dk}')" style="${btnStyle}">−</button>`:''}
+      ${weekCount<7?`<button onclick="addBeerToDay('${dk}')" style="${btnStyle}">+</button>`:''}
+    </div>`;
+    logHTML+=`<div class="beer-day-row" style="${isToday?'background:var(--surface);border-radius:6px;padding:6px 8px':''}">
+      <div class="beer-day-name">${days[i]}${isToday?' ◀':''}</div>
+      <div class="beer-day-icons">${'🍺'.repeat(count)||'—'}</div>
+      ${editBtns}
+    </div>`;
   }
   document.getElementById('beer-week-log').innerHTML=logHTML;
 }
@@ -1179,6 +1196,41 @@ function addBeer(){
   saveData();
   renderBeerTab();
   showToast('🍺 AF Beer logged');
+}
+
+function removeBeer(){
+  const today=dateKey();
+  const todayBeers=data.beerLog.filter(b=>b.date===today);
+  if(todayBeers.length===0){showToast('No beers logged today');return;}
+  // Remove the most recent one for today
+  const last=todayBeers[todayBeers.length-1];
+  data.beerLog=data.beerLog.filter(b=>b!==last);
+  saveData();
+  renderBeerTab();
+  showToast('🍺 Beer removed');
+}
+
+function addBeerToDay(dk){
+  const now=new Date();
+  const monday=getMonday(now);
+  const mondayKey=dateKey(monday);
+  const today=dateKey();
+  const weekCount=data.beerLog.filter(b=>b.date>=mondayKey&&b.date<=today).length;
+  if(weekCount>=7){showToast('Weekly limit reached (7)');return;}
+  data.beerLog.push({id:genId(),date:dk,loggedAt:new Date().toISOString()});
+  saveData();
+  renderBeerTab();
+  showToast('🍺 Beer added');
+}
+
+function removeBeerFromDay(dk){
+  const dayBeers=data.beerLog.filter(b=>b.date===dk);
+  if(dayBeers.length===0){showToast('No beers that day');return;}
+  const last=dayBeers[dayBeers.length-1];
+  data.beerLog=data.beerLog.filter(b=>b!==last);
+  saveData();
+  renderBeerTab();
+  showToast('🍺 Beer removed');
 }
 
 /* ===== ENTRIES ===== */
