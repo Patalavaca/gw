@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#E65100">
+<title>Groundwork</title>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0D0D0D;--surface:#161616;--surface2:#1E1E1E;--surface3:#252525;--orange:#E65100;--orange-light:#FF8F00;--orange-glow:rgba(230,81,0,.25);--gold:#FFD55A;--green:#4CAF50;--green-dark:#2E7D32;--red:#E53935;--red-dark:#B71C1C;--teal:#4DB6AC;--text:rgba(255,255,255,.87);--text2:rgba(255,255,255,.65);--text3:rgba(255,255,255,.45);--font-head:'Playfair Display',serif;--font-body:'Crimson Pro',serif;--radius:12px;--radius-sm:8px}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);font-size:16px;display:flex;flex-direction:column}
+h1,h2,h3{font-family:var(--font-head);font-weight:700}
+.app-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;flex-shrink:0}
+.app-title{font-family:var(--font-head);font-size:22px;color:var(--gold)}
+.header-actions{display:flex;gap:8px}
+.header-btn{background:none;border:none;color:var(--text2);font-size:18px;padding:6px;cursor:pointer;border-radius:6px}
+.header-btn:active{background:var(--surface2)}
+.tab-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 16px 90px;-webkit-overflow-scrolling:touch}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--surface);border-top:1px solid var(--surface3);padding:6px 0 env(safe-area-inset-bottom,8px);z-index:100}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:var(--text3);font-size:10px;font-family:var(--font-body);padding:6px 0;cursor:pointer}
+.nav-btn .nav-icon{font-size:22px}
+.nav-btn.active{color:var(--orange)}
+.nav-btn.active .nav-icon{transform:scale(1.1)}
+
+/* Stadium Visual */
+.stadium-container{text-align:center;margin:8px 0}
+.stadium-svg{width:100%;max-width:340px;height:auto}
+.stadium-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.stat-box{background:var(--surface);border-radius:var(--radius-sm);padding:10px 6px;text-align:center}
+.stat-val{font-family:var(--font-head);font-size:22px;color:var(--gold)}
+.stat-label{font-size:12px;color:var(--text2);margin-top:2px}
+.pace-box{background:var(--surface);border-radius:var(--radius);padding:12px;margin:8px 0;text-align:center}
+.pace-box .pace-date{color:var(--orange-light);font-weight:600;font-size:15px}
+.pace-box .pace-label{color:var(--text2);font-size:13px;margin-top:2px}
+.stadium-selector{display:flex;gap:8px;justify-content:center;margin:12px 0;flex-wrap:wrap}
+.stadium-dot{width:10px;height:10px;border-radius:50%;background:var(--surface3);border:none;cursor:pointer;padding:0}
+.stadium-dot.active{background:var(--orange);box-shadow:0 0 6px var(--orange-glow)}
+.stadium-dot.completed{background:var(--gold)}
+.stadium-dot.locked{background:var(--surface3)}
+.stadium-name-bar{text-align:center;margin:4px 0 8px}
+.stadium-name-bar h2{font-size:18px;color:var(--orange-light)}
+.stadium-name-bar .sub{font-size:13px;color:var(--text2)}
+
+/* Log Tab */
+.section-header{font-size:14px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--surface3)}
+.log-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.log-btn{background:var(--surface);border:1px solid var(--surface3);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer;font-family:var(--font-body);font-size:14px;color:var(--text)}
+.log-btn:active{background:var(--surface2);border-color:var(--surface3)}
+.log-btn .log-icon{font-size:24px;display:block;margin-bottom:4px}
+.log-btn.deposit{border-color:var(--green-dark)}
+.log-btn.deposit:active{background:rgba(76,175,80,.1)}
+.log-btn.withdrawal{border-color:var(--red-dark)}
+.log-btn.withdrawal:active{background:rgba(229,57,53,.1)}
+.preset-grid{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.preset-btn{background:var(--surface2);border:1px solid var(--surface3);border-radius:20px;padding:8px 14px;font-family:var(--font-body);font-size:13px;color:var(--text);cursor:pointer;white-space:nowrap}
+.preset-btn.dep{border-color:var(--green-dark);color:var(--green)}
+.preset-btn.wth{border-color:var(--red-dark);color:var(--red)}
+.preset-btn:active{opacity:.7}
+.add-preset-btn{border-style:dashed;color:var(--text3)}
+.recent-entries{margin:16px 0}
+.entry-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--surface2)}
+.entry-row.deleted{opacity:.35;text-decoration:line-through}
+.entry-dot{width:8px;height:8px;border-radius:50%;margin-right:10px;flex-shrink:0}
+.entry-dot.dep{background:var(--green)}
+.entry-dot.wth{background:var(--red)}
+.entry-info{flex:1;min-width:0}
+.entry-label{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry-date{font-size:11px;color:var(--text3)}
+.entry-cal{font-size:14px;font-weight:600;margin-left:8px;white-space:nowrap}
+.entry-cal.dep{color:var(--green)}
+.entry-cal.wth{color:var(--red)}
+.entry-del{background:none;border:none;color:var(--text3);font-size:16px;padding:6px;margin-left:4px;cursor:pointer}
+
+/* Beer Tab */
+.beer-main{text-align:center;padding:20px 0}
+.beer-count{font-family:var(--font-head);font-size:64px;color:var(--gold)}
+.beer-max{font-size:16px;color:var(--text2)}
+.beer-dots{display:flex;justify-content:center;gap:10px;margin:16px 0}
+.beer-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--surface3);display:flex;align-items:center;justify-content:center;font-size:16px}
+.beer-dot.filled{border-color:var(--gold);background:rgba(255,213,90,.15)}
+.beer-dot.over{border-color:var(--red);background:rgba(229,57,53,.15)}
+.beer-evening{background:var(--surface);border-radius:var(--radius);padding:14px;margin:16px 0}
+.beer-evening h3{font-size:14px;color:var(--text2);margin-bottom:8px}
+.beer-evening-dots{display:flex;justify-content:center;gap:12px}
+.beer-add-btn{background:var(--gold);color:var(--bg);border:none;border-radius:var(--radius);padding:14px 32px;font-family:var(--font-body);font-size:16px;font-weight:600;cursor:pointer;margin:16px 0}
+.beer-add-btn:active{opacity:.8}
+.beer-add-btn:disabled{opacity:.4;cursor:not-allowed}
+.beer-reset-note{font-size:12px;color:var(--text3);margin-top:4px}
+.beer-week-log{margin:16px 0}
+.beer-day-row{display:flex;align-items:center;padding:6px 0;border-bottom:1px solid var(--surface2)}
+.beer-day-name{width:50px;font-size:13px;color:var(--text2)}
+.beer-day-icons{flex:1;font-size:16px;letter-spacing:4px}
+
+/* History Tab */
+.history-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.history-filter{display:flex;gap:6px;margin:12px 0}
+.filter-btn{background:var(--surface2);border:1px solid var(--surface3);border-radius:16px;padding:6px 12px;font-family:var(--font-body);font-size:12px;color:var(--text2);cursor:pointer}
+.filter-btn.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+
+/* More Tab */
+.more-section{background:var(--surface);border-radius:var(--radius);margin:10px 0;overflow:hidden}
+.more-header{padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:600}
+.more-header .arrow{color:var(--text3);transition:transform .2s}
+.more-header.open .arrow{transform:rotate(90deg)}
+.more-body{padding:0 16px 14px;display:none}
+.more-body.open{display:block}
+.rule-item{padding:8px 0;border-bottom:1px solid var(--surface2);font-size:14px;color:var(--text2);line-height:1.5}
+.rule-item:last-child{border:none}
+.rule-cat{color:var(--orange-light);font-weight:600;font-size:13px;margin-bottom:2px}
+
+/* Overlays */
+.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.overlay.show{display:flex}
+.overlay-card{background:var(--surface);border-radius:var(--radius);padding:24px;width:100%;max-width:340px;max-height:80vh;overflow-y:auto}
+.overlay-title{font-family:var(--font-head);font-size:20px;margin-bottom:12px;text-align:center}
+.overlay-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text2);font-size:24px;cursor:pointer}
+.input-group{margin:12px 0}
+.input-group label{display:block;font-size:13px;color:var(--text2);margin-bottom:4px}
+.input-group input,.input-group select{width:100%;background:var(--surface2);border:1px solid var(--surface3);border-radius:var(--radius-sm);padding:12px;font-family:var(--font-body);font-size:16px;color:var(--text);outline:none}
+.input-group input:focus{border-color:var(--orange)}
+.calc-preview{background:var(--surface2);border-radius:var(--radius-sm);padding:10px;margin:8px 0;text-align:center;font-size:14px;color:var(--text2)}
+.calc-preview .highlight{color:var(--gold);font-weight:600;font-size:18px}
+.btn-row{display:flex;gap:8px;margin-top:16px}
+.btn{flex:1;padding:14px;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:15px;font-weight:600;cursor:pointer}
+.btn:active{opacity:.8}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-green{background:var(--green-dark);color:#fff}
+.btn-red{background:var(--red-dark);color:#fff}
+.btn-cancel{background:var(--surface3);color:var(--text2)}
+.btn-ghost{background:none;border:1px solid var(--surface3);color:var(--text2)}
+.confirm-impact{text-align:center;padding:12px 0;font-size:15px}
+.confirm-impact .blocks{font-family:var(--font-head);font-size:28px;margin:4px 0}
+.confirm-impact .blocks.neg{color:var(--red)}
+.confirm-impact .blocks.pos{color:var(--green)}
+.confirm-impact .rebuild{font-size:13px;color:var(--teal);margin-top:8px}
+.toast{display:none;position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--surface3);border-radius:var(--radius);padding:10px 20px;font-size:14px;color:var(--text);z-index:300;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.toast.show{display:block;animation:toastIn .3s ease}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.celebration-overlay{display:none;position:fixed;inset:0;z-index:250;pointer-events:none}
+.celebration-overlay.show{display:block}
+.celebration-text{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-head);font-size:28px;color:var(--gold);text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.6);animation:celebPulse 1s ease infinite alternate;pointer-events:none}
+@keyframes celebPulse{from{transform:translate(-50%,-50%) scale(1)}to{transform:translate(-50%,-50%) scale(1.08)}}
+.backup-overlay .code-area{width:100%;min-height:100px;background:var(--bg);border:1px solid var(--surface3);border-radius:var(--radius-sm);padding:10px;font-family:monospace;font-size:11px;color:var(--text2);resize:none;margin:8px 0}
+.empty-state{text-align:center;padding:32px 16px;color:var(--text3)}
+.empty-state .empty-icon{font-size:32px;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-title">Groundwork</div>
+  <div class="header-actions">
+    <button class="header-btn" onclick="showBackup('export')" title="Export">⬆</button>
+    <button class="header-btn" onclick="showBackup('import')" title="Import">⬇</button>
+  </div>
+</header>
+
+<div class="tab-content">
+  <!-- STADIUM TAB -->
+  <div id="tab-stadium" class="tab-panel active">
+    <div class="stadium-name-bar">
+      <h2 id="stadium-title">Mestalla</h2>
+      <div class="sub" id="stadium-sub">Valencia CF</div>
+    </div>
+    <div class="stadium-container">
+      <div id="stadium-svg-wrap"></div>
+    </div>
+    <div class="stadium-stats" id="stadium-stats"></div>
+    <div class="pace-box" id="pace-box"></div>
+    <div class="stadium-selector" id="stadium-dots"></div>
+  </div>
+
+  <!-- LOG TAB -->
+  <div id="tab-log" class="tab-panel">
+    <div class="section-header" style="color:var(--green)">💪 Earn</div>
+    <div class="log-grid">
+      <button class="log-btn deposit" onclick="showExerciseInput('swimming')"><span class="log-icon">🏊</span>Swimming</button>
+      <button class="log-btn deposit" onclick="showExerciseInput('treadmill')"><span class="log-icon">🏃</span>Treadmill</button>
+      <button class="log-btn deposit" onclick="showExerciseInput('steps')"><span class="log-icon">👟</span>Steps</button>
+      <button class="log-btn deposit" onclick="showExerciseInput('gym')"><span class="log-icon">🏋️</span>Other Gym</button>
+    </div>
+    <div id="deposit-presets" class="preset-grid"></div>
+
+    <div class="section-header" style="color:var(--red)">🍫 Spend</div>
+    <div id="withdrawal-presets" class="preset-grid"></div>
+    <button class="preset-btn wth" onclick="showCustomWithdrawal()" style="width:100%;text-align:center;margin-top:4px">+ Custom amount</button>
+
+    <div class="section-header">Recent</div>
+    <div id="recent-entries"></div>
+  </div>
+
+  <!-- BEER TAB -->
+  <div id="tab-beer" class="tab-panel">
+    <div class="beer-main">
+      <div style="font-size:13px;color:var(--text3);margin-bottom:4px">AF Beers This Week</div>
+      <div class="beer-count" id="beer-week-count">0</div>
+      <div class="beer-max">/ 7</div>
+      <div class="beer-dots" id="beer-week-dots"></div>
+      <div class="beer-reset-note" id="beer-reset-note"></div>
+    </div>
+    <div class="beer-evening" id="beer-evening-section">
+      <h3>This Evening (max 3)</h3>
+      <div class="beer-evening-dots" id="beer-evening-dots"></div>
+    </div>
+    <button class="beer-add-btn" id="beer-add-btn" onclick="addBeer()">🍺 Add AF Beer</button>
+    <div class="section-header">This Week</div>
+    <div id="beer-week-log"></div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div id="tab-history" class="tab-panel">
+    <div class="history-summary" id="history-summary"></div>
+    <div class="history-filter" id="history-filter"></div>
+    <div id="history-entries"></div>
+  </div>
+
+  <!-- MORE TAB -->
+  <div id="tab-more" class="tab-panel">
+    <div class="more-section">
+      <div class="more-header" onclick="toggleMore(this)">⚡ Presets <span class="arrow">›</span></div>
+      <div class="more-body" id="presets-manage"></div>
+    </div>
+    <div class="more-section">
+      <div class="more-header" onclick="toggleMore(this)">📋 Rules <span class="arrow">›</span></div>
+      <div class="more-body" id="rules-body"></div>
+    </div>
+    <div class="more-section">
+      <div class="more-header" onclick="toggleMore(this)">🏆 Completed Stadiums <span class="arrow">›</span></div>
+      <div class="more-body" id="completed-stadiums"></div>
+    </div>
+    <div class="more-section">
+      <div class="more-header" onclick="toggleMore(this)">ℹ️ About <span class="arrow">›</span></div>
+      <div class="more-body" id="about-body">
+        <p style="color:var(--text2);font-size:14px;line-height:1.6">
+          <strong>Groundwork</strong> — Earn calories through extra exercise, bank them as blocks, fill a football stadium, earn reward trips to real stadiums.<br><br>
+          100 cal = 1 block<br>
+          35 blocks = 1 banked pound<br>
+          3 pounds = 1 stadium complete<br><br>
+          localStorage: <code>bank_v1</code>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('stadium')"><span class="nav-icon">🏟️</span>Stadium</button>
+  <button class="nav-btn" onclick="switchTab('log')"><span class="nav-icon">➕</span>Log</button>
+  <button class="nav-btn" onclick="switchTab('beer')"><span class="nav-icon">🍺</span>Beer</button>
+  <button class="nav-btn" onclick="switchTab('history')"><span class="nav-icon">📊</span>History</button>
+  <button class="nav-btn" onclick="switchTab('more')"><span class="nav-icon">⋯</span>More</button>
+</nav>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="event.target===this&&hideOverlay()">
+  <div class="overlay-card" id="overlay-card"></div>
+</div>
+
+<!-- Backup Overlay -->
+<div class="overlay backup-overlay" id="backup-overlay" onclick="event.target===this&&hideBackup()">
+  <div class="overlay-card" id="backup-card"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Celebration -->
+<div class="celebration-overlay" id="celebration">
+  <canvas id="confetti-canvas"></canvas>
+  <div class="celebration-text" id="celebration-text"></div>
+</div>
+
+<script>
+/* ===== CONSTANTS ===== */
+const STORAGE_KEY='bank_v1';
+const CALS_PER_BLOCK=100;
+const BLOCKS_PER_POUND=35;
+const POUNDS_PER_STADIUM=3;
+const BLOCKS_PER_STADIUM=BLOCKS_PER_POUND*POUNDS_PER_STADIUM; // 105
+const STEP_THRESHOLD=11000;
+const STEP_BASE=10000;
+const STEP_CAL_PER_100=3;
+const SWIM_CAL_PER_LENGTH=5;
+const GYM_DISCOUNT=0.25;
+
+const STADIUMS=[
+  {id:'valencia',name:'Valencia CF',stadium:'Mestalla',city:'Valencia',emoji:'🦇',
+   colors:{primary:'#E65100',secondary:'#FFF',tertiary:'#1A1A1A',accent:'#FF8F00',
+           fan1:'#E65100',fan2:'#FFF',fan3:'#1A1A1A'},
+   opponent:'Deportivo',oppColors:{primary:'#005BAC',secondary:'#FFF'},
+   target:'Getafe (11 Apr) or Deportivo (21 Mar)'},
+  {id:'bergamo',name:'Atalanta BC',stadium:'Gewiss Stadium',city:'Bergamo',emoji:'⚫',
+   colors:{primary:'#1A1A1A',secondary:'#005BAC',tertiary:'#FFF',accent:'#003D7A',
+           fan1:'#1A1A1A',fan2:'#005BAC',fan3:'#FFF'}},
+  {id:'turin',name:'Turin',stadium:'TBD',city:'Turin',emoji:'🐂',
+   colors:{primary:'#6B1D1D',secondary:'#1A1A1A',tertiary:'#FFF',accent:'#8B2323',
+           fan1:'#6B1D1D',fan2:'#1A1A1A',fan3:'#FFF'}},
+  {id:'santander',name:'Racing Santander',stadium:'El Sardinero',city:'Santander',emoji:'🟢',
+   colors:{primary:'#2E7D32',secondary:'#FFF',tertiary:'#1A1A1A',accent:'#43A047',
+           fan1:'#2E7D32',fan2:'#FFF',fan3:'#1A1A1A'}}
+];
+
+const DEFAULT_DATA={
+  entries:[],
+  presets:[
+    {id:'p1',name:'Twix',calories:250,type:'withdrawal',category:'treat'},
+    {id:'p2',name:'Crisps',calories:180,type:'withdrawal',category:'treat'},
+    {id:'p3',name:'Dominos Medium',calories:1400,type:'withdrawal',category:'treat'},
+    {id:'p4',name:'KFC',calories:900,type:'withdrawal',category:'treat'},
+    {id:'p5',name:'Real Beer',calories:220,type:'withdrawal',category:'beer'},
+    {id:'p6',name:'50 Lengths',calories:250,type:'deposit',category:'swimming'},
+    {id:'p7',name:'40 Lengths',calories:200,type:'deposit',category:'swimming'},
+  ],
+  beerLog:[],
+  stadiums:{
+    valencia:{completed:false,completedDate:null,matchDate:'',matchDetails:'',notes:'',photos:[]},
+    bergamo:{completed:false,completedDate:null,matchDate:'',matchDetails:'',notes:'',photos:[]},
+    turin:{completed:false,completedDate:null,matchDate:'',matchDetails:'',notes:'',photos:[]},
+    santander:{completed:false,completedDate:null,matchDate:'',matchDetails:'',notes:'',photos:[]}
+  },
+  viewingStadium:'valencia',
+  version:1
+};
+
+let data;
+let currentTab='stadium';
+let historyFilter='all';
+
+/* ===== DATA ===== */
+function loadData(){
+  try{const raw=localStorage.getItem(STORAGE_KEY);
+    if(raw){data=JSON.parse(raw);
+      if(!data.presets)data.presets=DEFAULT_DATA.presets;
+      if(!data.beerLog)data.beerLog=[];
+      if(!data.stadiums)data.stadiums=JSON.parse(JSON.stringify(DEFAULT_DATA.stadiums));
+      if(!data.viewingStadium)data.viewingStadium='valencia';
+    }else{data=JSON.parse(JSON.stringify(DEFAULT_DATA));}
+  }catch(e){data=JSON.parse(JSON.stringify(DEFAULT_DATA));}
+}
+
+function saveData(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}catch(e){}
+}
+
+function dateKey(d){
+  d=d||new Date();
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
+
+function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
+
+function formatDate(dk){
+  const[y,m,d]=dk.split('-');
+  const dt=new Date(+y,+m-1,+d);
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return days[dt.getDay()]+' '+d+' '+months[+m-1];
+}
+
+/* ===== CALCULATIONS ===== */
+function getTotalCalories(){
+  return data.entries.filter(e=>!e.deleted).reduce((s,e)=>s+(e.type==='deposit'?e.calories:-e.calories),0);
+}
+
+function getTotalBlocks(){return getTotalCalories()/CALS_PER_BLOCK}
+
+function getStadiumProgress(){
+  const totalBlocks=getTotalBlocks();
+  const order=['valencia','bergamo','turin','santander'];
+  let completedCount=order.filter(s=>data.stadiums[s].completed).length;
+  let blocksAfterCompleted=totalBlocks-(completedCount*BLOCKS_PER_STADIUM);
+  let currentIdx=completedCount;
+  if(currentIdx>=order.length)currentIdx=order.length-1;
+  return{
+    currentStadium:order[currentIdx],
+    currentBlocks:blocksAfterCompleted,
+    totalBlocks,
+    completedCount,
+    pounds:totalBlocks/BLOCKS_PER_POUND,
+    poundsInCurrent:blocksAfterCompleted/BLOCKS_PER_POUND
+  };
+}
+
+function checkCompletion(){
+  const p=getStadiumProgress();
+  if(p.currentBlocks>=BLOCKS_PER_STADIUM&&!data.stadiums[p.currentStadium].completed){
+    data.stadiums[p.currentStadium].completed=true;
+    data.stadiums[p.currentStadium].completedDate=new Date().toISOString();
+    saveData();
+    showCelebration(p.currentStadium);
+  }
+}
+
+function getPaceForecast(){
+  const now=new Date();
+  const twoWeeksAgo=new Date(now.getTime()-14*86400000);
+  const twoWeeksKey=dateKey(twoWeeksAgo);
+  const recentDeps=data.entries.filter(e=>!e.deleted&&e.type==='deposit'&&e.date>=twoWeeksKey);
+  const totalRecent=recentDeps.reduce((s,e)=>s+e.calories,0);
+  const recentWith=data.entries.filter(e=>!e.deleted&&e.type==='withdrawal'&&e.date>=twoWeeksKey);
+  const totalWithRecent=recentWith.reduce((s,e)=>s+e.calories,0);
+  const netDaily=(totalRecent-totalWithRecent)/14;
+  const p=getStadiumProgress();
+  const blocksNeeded=BLOCKS_PER_STADIUM-Math.max(0,p.currentBlocks);
+  const calsNeeded=blocksNeeded*CALS_PER_BLOCK;
+  if(netDaily<=0)return{dailyRate:netDaily,daysNeeded:Infinity,completionDate:null};
+  const daysNeeded=Math.ceil(calsNeeded/netDaily);
+  const completionDate=new Date(now.getTime()+daysNeeded*86400000);
+  return{dailyRate:netDaily,daysNeeded,completionDate};
+}
+
+function calcExercise(type,value){
+  switch(type){
+    case'swimming':return{calories:value*SWIM_CAL_PER_LENGTH,label:value+' lengths',raw:value*SWIM_CAL_PER_LENGTH};
+    case'treadmill':
+    case'gym':{const cal=Math.round(value*(1-GYM_DISCOUNT));return{calories:cal,label:'Machine: '+value+' cal (−25%)',raw:value};}
+    case'steps':{
+      if(value<STEP_THRESHOLD)return{calories:0,label:value+' steps (below '+STEP_THRESHOLD.toLocaleString()+')',raw:0};
+      const above=value-STEP_BASE;
+      const cal=Math.floor(above/100)*STEP_CAL_PER_100;
+      return{calories:cal,label:value.toLocaleString()+' steps',raw:cal};
+    }
+    default:return{calories:value,label:value+' cal',raw:value};
+  }
+}
+
+/* ===== STADIUM SVG ===== */
+function generateStadiumSVG(stadiumId){
+  const sConfig=STADIUMS.find(s=>s.id===stadiumId);
+  const isActive=getStadiumProgress().currentStadium===stadiumId;
+  const isCompleted=data.stadiums[stadiumId].completed;
+  const isLocked=!isActive&&!isCompleted;
+  const viewing=stadiumId;
+
+  let blocksInStadium=0;
+  if(isCompleted){blocksInStadium=BLOCKS_PER_STADIUM;}
+  else if(isActive){blocksInStadium=Math.max(0,getStadiumProgress().currentBlocks);}
+
+  const c=sConfig.colors;
+  const primaryFill=isLocked?'#2A2A2A':c.primary;
+  const secondaryFill=isLocked?'#333':c.secondary;
+  const blockFillA=isLocked?'#2A2A2A':c.primary;
+  const blockFillB=isLocked?'#333':c.accent||c.secondary;
+  const emptyBlock=isLocked?'#1A1A1A':'#1A1A1A';
+  const pitchGreen=isLocked?'#1A2A1A':'#2E5B2E';
+  const pitchLine=isLocked?'#2A3A2A':'rgba(255,255,255,.25)';
+  const floodOn=isCompleted;
+
+  // Phase: construction (0-35) or stands (35-105)
+  const constructionBlocks=Math.min(blocksInStadium,BLOCKS_PER_POUND); // 0-35
+  const standBlocks=Math.max(0,blocksInStadium-BLOCKS_PER_POUND); // 0-70
+  const inConstruction=blocksInStadium<BLOCKS_PER_POUND;
+
+  let svg=`<svg class="stadium-svg" viewBox="0 0 320 270" xmlns="http://www.w3.org/2000/svg">`;
+  // Background
+  svg+=`<rect width="320" height="270" fill="none"/>`;
+
+  // Floodlight towers
+  const flPos=[[28,22],[292,22],[28,242],[292,242]];
+  flPos.forEach(([fx,fy])=>{
+    svg+=`<rect x="${fx-2}" y="${fy}" width="4" height="40" fill="${isLocked?'#222':'#555'}" rx="1"/>`;
+    svg+=`<rect x="${fx-6}" y="${fy-2}" width="12" height="6" fill="${isLocked?'#222':'#666'}" rx="1"/>`;
+    if(floodOn){
+      svg+=`<circle cx="${fx}" cy="${fy}" r="10" fill="rgba(255,213,90,.15)"/>`;
+      svg+=`<circle cx="${fx}" cy="${fy}" r="5" fill="rgba(255,213,90,.3)"/>`;
+    }
+  });
+
+  // Stand backgrounds
+  // North (top, steep)
+  svg+=`<rect x="48" y="14" width="224" height="52" fill="${isLocked?'#181818':'#1A1A1A'}" rx="3" stroke="${isLocked?'#222':'#333'}" stroke-width="1"/>`;
+  // South (bottom)
+  svg+=`<rect x="48" y="200" width="224" height="48" fill="${isLocked?'#181818':'#1A1A1A'}" rx="3" stroke="${isLocked?'#222':'#333'}" stroke-width="1"/>`;
+  // West (left, main, roofed)
+  svg+=`<rect x="6" y="64" width="42" height="140" fill="${isLocked?'#181818':'#1A1A1A'}" rx="3" stroke="${isLocked?'#222':'#333'}" stroke-width="1"/>`;
+  // Roof on west stand
+  if(!isLocked){
+    svg+=`<rect x="2" y="60" width="50" height="4" fill="#444" rx="1"/>`;
+    svg+=`<rect x="4" y="56" width="46" height="4" fill="#333" rx="1"/>`;
+  }
+  // East (right)
+  svg+=`<rect x="272" y="64" width="42" height="140" fill="${isLocked?'#181818':'#1A1A1A'}" rx="3" stroke="${isLocked?'#222':'#333'}" stroke-width="1"/>`;
+
+  // Pitch
+  svg+=`<rect x="50" y="68" width="220" height="130" fill="${pitchGreen}" rx="2"/>`;
+  // Pitch stripes
+  for(let i=1;i<10;i++){
+    const sx=50+i*22;
+    svg+=`<line x1="${sx}" y1="68" x2="${sx}" y2="198" stroke="${pitchLine}" stroke-width=".5"/>`;
+  }
+  // Centre circle
+  svg+=`<circle cx="160" cy="133" r="20" fill="none" stroke="${pitchLine}" stroke-width=".8"/>`;
+  svg+=`<circle cx="160" cy="133" r="2" fill="${pitchLine}"/>`;
+  // Centre line
+  svg+=`<line x1="160" y1="68" x2="160" y2="198" stroke="${pitchLine}" stroke-width=".8"/>`;
+  // Penalty areas
+  svg+=`<rect x="50" y="103" width="30" height="60" fill="none" stroke="${pitchLine}" stroke-width=".8"/>`;
+  svg+=`<rect x="240" y="103" width="30" height="60" fill="none" stroke="${pitchLine}" stroke-width=".8"/>`;
+  // Goals
+  svg+=`<rect x="46" y="123" width="4" height="20" fill="none" stroke="${pitchLine}" stroke-width=".8"/>`;
+  svg+=`<rect x="270" y="123" width="4" height="20" fill="none" stroke="${pitchLine}" stroke-width=".8"/>`;
+
+  if(isLocked){
+    // Lock icon
+    svg+=`<text x="160" y="130" text-anchor="middle" font-size="32" fill="#333">🔒</text>`;
+    svg+=`<text x="160" y="155" text-anchor="middle" font-size="11" fill="#444" font-family="'Crimson Pro',serif">Complete ${STADIUMS[STADIUMS.findIndex(s=>s.id===stadiumId)-1]?.stadium||'previous'} first</text>`;
+    svg+=`</svg>`;
+    return svg;
+  }
+
+  // CONSTRUCTION PHASE
+  if(inConstruction&&!isCompleted){
+    // Foundation grid on pitch (7x5 = 35 blocks)
+    const fCols=7,fRows=5;
+    const fW=28,fH=22,fGap=2;
+    const fStartX=52+(220-fCols*(fW+fGap))/2;
+    const fStartY=70+(130-fRows*(fH+fGap))/2;
+    let blockIdx=0;
+    for(let r=fRows-1;r>=0;r--){
+      for(let col=0;col<fCols;col++){
+        const filled=blockIdx<constructionBlocks;
+        const bx=fStartX+col*(fW+fGap);
+        const by=fStartY+r*(fH+fGap);
+        svg+=`<rect x="${bx}" y="${by}" width="${fW}" height="${fH}" fill="${filled?'#555':'#1A1A1A'}" rx="2" stroke="${filled?'#666':'#222'}" stroke-width=".5" opacity="${filled?.9:.3}"/>`;
+        blockIdx++;
+      }
+    }
+    // Construction elements at thresholds
+    if(constructionBlocks>=3){
+      // Safety barriers
+      svg+=`<line x1="55" y1="195" x2="80" y2="195" stroke="#E8A735" stroke-width="2" stroke-dasharray="4,3"/>`;
+      svg+=`<line x1="240" y1="195" x2="265" y2="195" stroke="#E8A735" stroke-width="2" stroke-dasharray="4,3"/>`;
+    }
+    if(constructionBlocks>=8){
+      // Digger (simple)
+      svg+=`<rect x="220" y="170" width="18" height="10" fill="#D4A017" rx="2"/>`;
+      svg+=`<rect x="230" y="162" width="3" height="8" fill="#D4A017"/>`;
+      svg+=`<rect x="233" y="158" width="10" height="3" fill="#8B7500" rx="1"/>`;
+      svg+=`<circle cx="223" cy="182" r="3" fill="#555"/>`;
+      svg+=`<circle cx="235" cy="182" r="3" fill="#555"/>`;
+    }
+    if(constructionBlocks>=15){
+      // Crane
+      svg+=`<line x1="100" y1="72" x2="100" y2="40" stroke="#777" stroke-width="2"/>`;
+      svg+=`<line x1="85" y1="42" x2="130" y2="42" stroke="#777" stroke-width="2"/>`;
+      svg+=`<line x1="130" y1="42" x2="130" y2="55" stroke="#555" stroke-width="1" stroke-dasharray="2,2"/>`;
+      svg+=`<rect x="126" y="55" width="8" height="6" fill="#888"/>`;
+    }
+    if(constructionBlocks>=25){
+      // More scaffolding
+      svg+=`<line x1="55" y1="63" x2="55" y2="30" stroke="#555" stroke-width="1"/>`;
+      svg+=`<line x1="265" y1="63" x2="265" y2="30" stroke="#555" stroke-width="1"/>`;
+      svg+=`<line x1="55" y1="45" x2="75" y2="45" stroke="#555" stroke-width="1"/>`;
+      svg+=`<line x1="245" y1="45" x2="265" y2="45" stroke="#555" stroke-width="1"/>`;
+    }
+    // Progress text
+    const pct=Math.round(constructionBlocks/BLOCKS_PER_POUND*100);
+    svg+=`<text x="160" y="258" text-anchor="middle" font-size="11" fill="#888" font-family="'Crimson Pro',serif">Foundations: ${constructionBlocks}/${BLOCKS_PER_POUND} blocks (${pct}%)</text>`;
+  }
+
+  // STAND FILLING PHASE
+  if(!inConstruction||isCompleted){
+    // Generate block positions for each stand
+    const standConfigs=[
+      {name:'north',blocks:18,cols:6,rows:3,getPos:(r,c)=>({x:52+c*37,y:55-r*14,w:34,h:12})},
+      {name:'east',blocks:18,cols:6,rows:3,getPos:(r,c)=>({x:275+r*13,y:67+c*23,w:11,h:21})},
+      {name:'south',blocks:17,cols:6,rows:3,getPos:(r,c)=>({x:52+c*37,y:203+r*14,w:34,h:12}),lastRowCols:5},
+      {name:'west',blocks:17,cols:6,rows:3,getPos:(r,c)=>({x:37-r*13,y:67+c*23,w:11,h:21}),lastRowCols:5}
+    ];
+
+    // Build fill order: row by row across all stands
+    const fillOrder=[];
+    for(let row=0;row<3;row++){
+      for(const sc of standConfigs){
+        const cols=row===2&&sc.lastRowCols?sc.lastRowCols:sc.cols;
+        for(let col=0;col<cols;col++){
+          fillOrder.push({...sc.getPos(row,col),stand:sc.name,row,col});
+        }
+      }
+    }
+
+    const filledCount=isCompleted?70:Math.min(70,Math.floor(standBlocks));
+    fillOrder.forEach((b,i)=>{
+      const filled=i<filledCount;
+      const useColor=filled?(i%3===0?blockFillA:i%3===1?blockFillB:secondaryFill):emptyBlock;
+      const op=filled?'.85':'.2';
+      svg+=`<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="${useColor}" rx="1.5" opacity="${op}"/>`;
+    });
+
+    // Completed matchday elements
+    if(isCompleted){
+      // Fan dots on stands
+      for(let i=0;i<30;i++){
+        const sx=55+Math.random()*210;
+        const sy=16+Math.random()*46;
+        svg+=`<circle cx="${sx}" cy="${sy}" r="1.5" fill="${[c.fan1,c.fan2,c.fan3][i%3]}" opacity=".6"/>`;
+      }
+      for(let i=0;i<30;i++){
+        const sx=55+Math.random()*210;
+        const sy=202+Math.random()*42;
+        svg+=`<circle cx="${sx}" cy="${sy}" r="1.5" fill="${[c.fan1,c.fan2,c.fan3][i%3]}" opacity=".6"/>`;
+      }
+      // Flags
+      svg+=`<polygon points="80,18 80,10 92,14" fill="${c.primary}" opacity=".7"/>`;
+      svg+=`<polygon points="200,18 200,10 212,14" fill="${c.secondary}" opacity=".7"/>`;
+      // Team buses at bottom
+      svg+=`<rect x="100" y="254" width="28" height="12" fill="${c.primary}" rx="3"/>`;
+      svg+=`<rect x="100" y="254" width="10" height="12" fill="rgba(255,255,255,.15)" rx="3"/>`;
+      svg+=`<circle cx="106" cy="268" r="2.5" fill="#333"/>`;
+      svg+=`<circle cx="122" cy="268" r="2.5" fill="#333"/>`;
+      const opp=sConfig.oppColors||{primary:'#555',secondary:'#FFF'};
+      svg+=`<rect x="192" y="254" width="28" height="12" fill="${opp.primary}" rx="3"/>`;
+      svg+=`<rect x="192" y="254" width="10" height="12" fill="rgba(255,255,255,.15)" rx="3"/>`;
+      svg+=`<circle cx="198" cy="268" r="2.5" fill="#333"/>`;
+      svg+=`<circle cx="214" cy="268" r="2.5" fill="#333"/>`;
+      svg+=`<text x="160" y="264" text-anchor="middle" font-size="8" fill="#888" font-family="'Crimson Pro',serif">MATCH DAY</text>`;
+    }
+  }
+
+  svg+=`</svg>`;
+  return svg;
+}
+
+/* ===== TAB RENDERING ===== */
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['stadium','log','beer','history','more'][i]===tab);
+  });
+  renderCurrentTab();
+}
+
+function renderCurrentTab(){
+  switch(currentTab){
+    case'stadium':renderStadiumTab();break;
+    case'log':renderLogTab();break;
+    case'beer':renderBeerTab();break;
+    case'history':renderHistoryTab();break;
+    case'more':renderMoreTab();break;
+  }
+}
+
+function renderStadiumTab(){
+  const viewing=data.viewingStadium||'valencia';
+  const sConfig=STADIUMS.find(s=>s.id===viewing);
+  const p=getStadiumProgress();
+
+  document.getElementById('stadium-title').textContent=sConfig.stadium;
+  document.getElementById('stadium-sub').textContent=sConfig.name+' · '+sConfig.city;
+
+  document.getElementById('stadium-svg-wrap').innerHTML=generateStadiumSVG(viewing);
+
+  // Stats
+  const isActive=p.currentStadium===viewing;
+  const isCompleted=data.stadiums[viewing].completed;
+  let displayBlocks,displayPounds;
+  if(isCompleted){displayBlocks=BLOCKS_PER_STADIUM;displayPounds=POUNDS_PER_STADIUM;}
+  else if(isActive){displayBlocks=Math.max(0,p.currentBlocks);displayPounds=Math.max(0,p.poundsInCurrent);}
+  else{displayBlocks=0;displayPounds=0;}
+
+  document.getElementById('stadium-stats').innerHTML=`
+    <div class="stat-box"><div class="stat-val">${Math.floor(displayBlocks)}</div><div class="stat-label">blocks / ${BLOCKS_PER_STADIUM}</div></div>
+    <div class="stat-box"><div class="stat-val">${displayPounds.toFixed(1)}</div><div class="stat-label">pounds / ${POUNDS_PER_STADIUM}</div></div>
+    <div class="stat-box"><div class="stat-val">${isCompleted?'✓':Math.max(0,BLOCKS_PER_STADIUM-Math.floor(displayBlocks))}</div><div class="stat-label">${isCompleted?'complete':'blocks to go'}</div></div>`;
+
+  // Pace forecast
+  const pace=getPaceForecast();
+  let paceHTML='';
+  if(isActive&&!isCompleted){
+    if(pace.completionDate){
+      const opts={day:'numeric',month:'short',year:'numeric'};
+      paceHTML=`<div class="pace-date">${pace.completionDate.toLocaleDateString('en-GB',opts)}</div>
+        <div class="pace-label">Estimated completion at current pace (${Math.round(pace.dailyRate)} cal/day net)</div>`;
+    }else if(p.currentBlocks<0){
+      paceHTML=`<div class="pace-date" style="color:var(--red)">${Math.abs(Math.floor(p.currentBlocks))} blocks in debt</div>
+        <div class="pace-label">Clear the debt before building resumes</div>`;
+    }else{
+      paceHTML=`<div class="pace-label">Not enough activity yet to forecast</div>`;
+    }
+  }else if(isCompleted){
+    const cd=data.stadiums[viewing].completedDate;
+    paceHTML=`<div class="pace-date" style="color:var(--gold)">🏆 Completed${cd?' '+new Date(cd).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):''}</div>
+      <div class="pace-label">Book your trip! Target: ${sConfig.target||sConfig.city}</div>`;
+  }
+  document.getElementById('pace-box').innerHTML=paceHTML;
+  document.getElementById('pace-box').style.display=paceHTML?'':'none';
+
+  // Stadium dots
+  let dotsHTML='';
+  STADIUMS.forEach(s=>{
+    const cls=data.stadiums[s.id].completed?'completed':p.currentStadium===s.id?'active':'locked';
+    const sel=s.id===viewing?'active':'';
+    dotsHTML+=`<button class="stadium-dot ${cls} ${sel}" onclick="viewStadium('${s.id}')" title="${s.name}"></button>`;
+  });
+  document.getElementById('stadium-dots').innerHTML=dotsHTML;
+}
+
+function viewStadium(id){
+  data.viewingStadium=id;
+  saveData();
+  renderStadiumTab();
+}
+
+function renderLogTab(){
+  // Deposit presets
+  const depPresets=data.presets.filter(p=>p.type==='deposit');
+  let depHTML='';
+  depPresets.forEach(p=>{
+    depHTML+=`<button class="preset-btn dep" onclick="usePreset('${p.id}')">${p.name} (${p.calories})</button>`;
+  });
+  document.getElementById('deposit-presets').innerHTML=depHTML;
+
+  // Withdrawal presets
+  const wthPresets=data.presets.filter(p=>p.type==='withdrawal');
+  let wthHTML='';
+  wthPresets.forEach(p=>{
+    wthHTML+=`<button class="preset-btn wth" onclick="confirmWithdrawal('${p.name}',${p.calories})">${p.name} (${p.calories})</button>`;
+  });
+  document.getElementById('withdrawal-presets').innerHTML=wthHTML;
+
+  // Recent entries
+  const recent=data.entries.filter(e=>!e.deleted).slice(-8).reverse();
+  let recentHTML='';
+  if(recent.length===0){
+    recentHTML='<div class="empty-state"><div class="empty-icon">📝</div>No entries yet</div>';
+  }else{
+    recent.forEach(e=>{
+      const cls=e.type==='deposit'?'dep':'wth';
+      const sign=e.type==='deposit'?'+':'−';
+      recentHTML+=`<div class="entry-row${e.deleted?' deleted':''}">
+        <div class="entry-dot ${cls}"></div>
+        <div class="entry-info"><div class="entry-label">${e.label}</div><div class="entry-date">${formatDate(e.date)}${e.backdated?' · backdated':''}</div></div>
+        <div class="entry-cal ${cls}">${sign}${e.calories}</div>
+        <button class="entry-del" onclick="deleteEntry('${e.id}')">×</button>
+      </div>`;
+    });
+  }
+  document.getElementById('recent-entries').innerHTML=recentHTML;
+}
+
+function renderBeerTab(){
+  const today=dateKey();
+  const now=new Date();
+  const monday=getMonday(now);
+  const mondayKey=dateKey(monday);
+
+  const weekBeers=data.beerLog.filter(b=>b.date>=mondayKey&&b.date<=today);
+  const todayBeers=data.beerLog.filter(b=>b.date===today);
+  const eveningBeers=todayBeers.filter(b=>{
+    const t=new Date(b.loggedAt);return t.getHours()>=17;
+  });
+
+  const weekCount=weekBeers.length;
+  const eveningCount=eveningBeers.length;
+
+  document.getElementById('beer-week-count').textContent=weekCount;
+  document.getElementById('beer-week-count').style.color=weekCount>7?'var(--red)':'var(--gold)';
+
+  // Week dots
+  let dotsHTML='';
+  for(let i=0;i<7;i++){
+    const filled=i<weekCount;
+    const over=i>=7;
+    dotsHTML+=`<div class="beer-dot ${filled?'filled':''} ${over?'over':''}">🍺</div>`;
+  }
+  document.getElementById('beer-week-dots').innerHTML=dotsHTML;
+
+  // Reset note
+  const nextMonday=new Date(monday.getTime()+7*86400000);
+  const daysToReset=Math.ceil((nextMonday-now)/86400000);
+  document.getElementById('beer-reset-note').textContent=`Resets Monday (${daysToReset} day${daysToReset!==1?'s':''})`;
+
+  // Evening dots
+  let evHTML='';
+  for(let i=0;i<3;i++){
+    evHTML+=`<div class="beer-dot ${i<eveningCount?'filled':''}">${i<eveningCount?'🍺':'○'}</div>`;
+  }
+  document.getElementById('beer-evening-dots').innerHTML=evHTML;
+
+  // Warning
+  const btn=document.getElementById('beer-add-btn');
+  if(weekCount>=7){
+    btn.disabled=true;btn.textContent='Weekly limit reached';
+  }else if(eveningCount>=3){
+    btn.disabled=true;btn.textContent='Evening limit reached (3)';
+  }else{
+    btn.disabled=false;btn.textContent='🍺 Add AF Beer';
+  }
+
+  // Week log
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let logHTML='';
+  for(let i=0;i<7;i++){
+    const d=new Date(monday.getTime()+i*86400000);
+    const dk=dateKey(d);
+    const count=data.beerLog.filter(b=>b.date===dk).length;
+    logHTML+=`<div class="beer-day-row"><div class="beer-day-name">${days[i]}</div><div class="beer-day-icons">${'🍺'.repeat(count)||'—'}</div></div>`;
+  }
+  document.getElementById('beer-week-log').innerHTML=logHTML;
+}
+
+function getMonday(d){
+  d=new Date(d);
+  const day=d.getDay();
+  const diff=d.getDate()-day+(day===0?-6:1);
+  return new Date(d.getFullYear(),d.getMonth(),diff);
+}
+
+function renderHistoryTab(){
+  const p=getStadiumProgress();
+  const totalCal=getTotalCalories();
+  const totalDeps=data.entries.filter(e=>!e.deleted&&e.type==='deposit').reduce((s,e)=>s+e.calories,0);
+  const totalWith=data.entries.filter(e=>!e.deleted&&e.type==='withdrawal').reduce((s,e)=>s+e.calories,0);
+
+  document.getElementById('history-summary').innerHTML=`
+    <div class="stat-box"><div class="stat-val" style="color:var(--green)">${totalDeps.toLocaleString()}</div><div class="stat-label">total earned</div></div>
+    <div class="stat-box"><div class="stat-val" style="color:var(--red)">${totalWith.toLocaleString()}</div><div class="stat-label">total spent</div></div>
+    <div class="stat-box"><div class="stat-val">${totalCal.toLocaleString()}</div><div class="stat-label">net calories</div></div>
+    <div class="stat-box"><div class="stat-val">${p.totalBlocks.toFixed(1)}</div><div class="stat-label">total blocks</div></div>`;
+
+  // Filter buttons
+  document.getElementById('history-filter').innerHTML=`
+    <button class="filter-btn ${historyFilter==='all'?'active':''}" onclick="setHistoryFilter('all')">All</button>
+    <button class="filter-btn ${historyFilter==='deposit'?'active':''}" onclick="setHistoryFilter('deposit')">Deposits</button>
+    <button class="filter-btn ${historyFilter==='withdrawal'?'active':''}" onclick="setHistoryFilter('withdrawal')">Withdrawals</button>`;
+
+  // Entries
+  let entries=data.entries.slice().reverse();
+  if(historyFilter!=='all')entries=entries.filter(e=>e.type===historyFilter);
+
+  let html='';
+  if(entries.length===0){
+    html='<div class="empty-state"><div class="empty-icon">📊</div>No entries yet</div>';
+  }else{
+    entries.slice(0,50).forEach(e=>{
+      const cls=e.type==='deposit'?'dep':'wth';
+      const sign=e.type==='deposit'?'+':'−';
+      html+=`<div class="entry-row${e.deleted?' deleted':''}">
+        <div class="entry-dot ${cls}"></div>
+        <div class="entry-info"><div class="entry-label">${e.label}</div><div class="entry-date">${formatDate(e.date)}${e.backdated?' · backdated':''}${e.deleted?' · deleted':''}</div></div>
+        <div class="entry-cal ${cls}">${sign}${e.calories}</div>
+      </div>`;
+    });
+    if(entries.length>50)html+=`<div style="text-align:center;padding:12px;color:var(--text3)">Showing 50 of ${entries.length}</div>`;
+  }
+  document.getElementById('history-entries').innerHTML=html;
+}
+
+function setHistoryFilter(f){historyFilter=f;renderHistoryTab();}
+
+function renderMoreTab(){
+  // Presets
+  let presetsHTML='';
+  data.presets.forEach(p=>{
+    const cls=p.type==='deposit'?'dep':'wth';
+    presetsHTML+=`<div class="entry-row">
+      <div class="entry-dot ${cls}"></div>
+      <div class="entry-info"><div class="entry-label">${p.name}</div><div class="entry-date">${p.type} · ${p.calories} cal</div></div>
+      <button class="entry-del" onclick="editPreset('${p.id}')">✎</button>
+      <button class="entry-del" onclick="removePreset('${p.id}')">×</button>
+    </div>`;
+  });
+  presetsHTML+=`<button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="showAddPreset()">+ New Preset</button>`;
+  document.getElementById('presets-manage').innerHTML=presetsHTML;
+
+  // Rules
+  document.getElementById('rules-body').innerHTML=`
+    <div class="rule-item"><div class="rule-cat">Exercise Credits</div>Swimming: 5 cal per length (already discounted)<br>Treadmill/Gym: machine figure minus 25%<br>Steps: threshold 11,000 — then 30 cal per 1,000 above 10,000<br>Don't double-count treadmill + phone steps</div>
+    <div class="rule-item"><div class="rule-cat">Withdrawals (Treats Only)</div>Chocolate, crisps, sweets, evening cereal — at label calories<br>Chinese, Indian, pizza, KFC — at real calories<br>Real beer alone at home<br><br><strong>NOT withdrawals:</strong> Yara, Thai, fish & chips (Wales), journey meals, social beers</div>
+    <div class="rule-item"><div class="rule-cat">Beer Rules</div>7 AF beers per week (resets Mondays)<br>Max 3 in one evening<br>Real beer at home alone = withdrawal<br>Social real beer = fine</div>
+    <div class="rule-item"><div class="rule-cat">Bank Rules</div>Bank can go negative<br>No floor, no ceiling<br>Holidays = just don't log (no earning, no withdrawals)<br>Log at the moment, not the next morning<br>Completed stadiums are locked forever — withdrawals come off the next one</div>
+    <div class="rule-item"><div class="rule-cat">Stadium Rewards</div>100 cal = 1 block<br>35 blocks = 1 banked pound<br>3 pounds = 1 stadium (105 blocks)<br>Stadiums: Valencia → Bergamo → Turin → Santander<br>Excess blocks carry over to next stadium</div>
+    <div class="rule-item"><div class="rule-cat">Stadium Trips</div>All trips are 3 nights<br>Stadium trips are ALWAYS extra — never count towards other travel<br>Valencia target: Getafe (11 Apr) or Deportivo (21 Mar)</div>`;
+
+  // Completed stadiums
+  const completedList=STADIUMS.filter(s=>data.stadiums[s.id].completed);
+  if(completedList.length===0){
+    document.getElementById('completed-stadiums').innerHTML='<div class="empty-state">No stadiums completed yet. Keep building!</div>';
+  }else{
+    let cHTML='';
+    completedList.forEach(s=>{
+      const sd=data.stadiums[s.id];
+      cHTML+=`<div style="padding:8px 0;border-bottom:1px solid var(--surface2)">
+        <div style="font-weight:600;color:${s.colors.primary}">${s.emoji} ${s.stadium} — ${s.name}</div>
+        <div style="font-size:13px;color:var(--text2)">Completed: ${sd.completedDate?new Date(sd.completedDate).toLocaleDateString('en-GB'):'—'}</div>
+        ${sd.matchDate?`<div style="font-size:13px;color:var(--text2)">Match: ${sd.matchDate} · ${sd.matchDetails}</div>`:''}
+        ${sd.notes?`<div style="font-size:13px;color:var(--text3);margin-top:4px">${sd.notes}</div>`:''}
+        <button class="btn btn-ghost" style="margin-top:6px;padding:8px;font-size:12px" onclick="editMemory('${s.id}')">Edit memory</button>
+      </div>`;
+    });
+    document.getElementById('completed-stadiums').innerHTML=cHTML;
+  }
+}
+
+function toggleMore(header){
+  header.classList.toggle('open');
+  const body=header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+/* ===== EXERCISE INPUT ===== */
+function showExerciseInput(type){
+  const titles={swimming:'🏊 Swimming',treadmill:'🏃 Treadmill',steps:'👟 Steps',gym:'🏋️ Other Gym'};
+  const labels={swimming:'How many lengths?',treadmill:'Calories on the machine?',steps:"Today's step total?",gym:'Calories on the machine?'};
+  const placeholders={swimming:'e.g. 50',treadmill:'e.g. 400',steps:'e.g. 14000',gym:'e.g. 300'};
+
+  const card=document.getElementById('overlay-card');
+  card.innerHTML=`
+    <div class="overlay-title">${titles[type]}</div>
+    <div class="input-group">
+      <label>${labels[type]}</label>
+      <input type="number" id="exercise-input" inputmode="numeric" placeholder="${placeholders[type]}" oninput="updateExercisePreview('${type}')">
+    </div>
+    <div class="calc-preview" id="exercise-preview">Enter a value above</div>
+    <div class="input-group">
+      <label>Date (leave blank for today)</label>
+      <input type="date" id="exercise-date" value="${dateKey()}" max="${dateKey()}">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-cancel" onclick="hideOverlay()">Cancel</button>
+      <button class="btn btn-green" id="exercise-submit" onclick="submitExercise('${type}')" disabled>Bank it</button>
+    </div>`;
+  showOverlay();
+  document.getElementById('exercise-input').focus();
+}
+
+function updateExercisePreview(type){
+  const val=parseInt(document.getElementById('exercise-input').value)||0;
+  const result=calcExercise(type,val);
+  const blocks=(result.calories/CALS_PER_BLOCK).toFixed(1);
+  const preview=document.getElementById('exercise-preview');
+  const submit=document.getElementById('exercise-submit');
+
+  if(val<=0||result.calories<=0){
+    if(type==='steps'&&val>0&&val<STEP_THRESHOLD){
+      preview.innerHTML=`<span style="color:var(--text3)">Below ${STEP_THRESHOLD.toLocaleString()} threshold — nothing banked</span>`;
+    }else{
+      preview.innerHTML='Enter a value above';
+    }
+    submit.disabled=true;
+    return;
+  }
+  preview.innerHTML=`<div class="highlight" style="color:var(--green)">+${result.calories} cal (+${blocks} blocks)</div>`;
+  submit.disabled=false;
+}
+
+function submitExercise(type){
+  const val=parseInt(document.getElementById('exercise-input').value)||0;
+  const entryDate=document.getElementById('exercise-date').value||dateKey();
+  const result=calcExercise(type,val);
+  if(result.calories<=0)return;
+
+  const backdated=entryDate!==dateKey();
+  const entry={
+    id:genId(),type:'deposit',category:type,
+    label:result.label,rawCalories:result.raw,calories:result.calories,
+    blocks:result.calories/CALS_PER_BLOCK,
+    date:entryDate,loggedAt:new Date().toISOString(),
+    backdated
+  };
+  data.entries.push(entry);
+  saveData();
+  hideOverlay();
+  checkCompletion();
+  showToast(`+${result.calories} cal banked (+${(result.calories/CALS_PER_BLOCK).toFixed(1)} blocks)`);
+  renderCurrentTab();
+}
+
+/* ===== WITHDRAWAL ===== */
+function confirmWithdrawal(name,calories){
+  const blocks=(calories/CALS_PER_BLOCK).toFixed(1);
+  const swimLengths=Math.ceil(calories/SWIM_CAL_PER_LENGTH);
+
+  const card=document.getElementById('overlay-card');
+  card.innerHTML=`
+    <div class="overlay-title">🍫 ${name}</div>
+    <div class="confirm-impact">
+      <div style="color:var(--text2)">This knocks down</div>
+      <div class="blocks neg">${blocks} blocks</div>
+      <div style="color:var(--text3);font-size:13px">(${calories} calories)</div>
+      <div class="rebuild">🏊 ${swimLengths} lengths rebuilds this</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-cancel" onclick="hideOverlay()">Actually, no</button>
+      <button class="btn btn-red" onclick="submitWithdrawal('${name.replace(/'/g,"\\'")}',${calories})">Yes, I chose this</button>
+    </div>`;
+  showOverlay();
+}
+
+function showCustomWithdrawal(){
+  const card=document.getElementById('overlay-card');
+  card.innerHTML=`
+    <div class="overlay-title">Custom Withdrawal</div>
+    <div class="input-group">
+      <label>What was it?</label>
+      <input type="text" id="wth-name" placeholder="e.g. Galaxy bar">
+    </div>
+    <div class="input-group">
+      <label>Calories</label>
+      <input type="number" id="wth-cal" inputmode="numeric" placeholder="e.g. 230" oninput="updateWithdrawalPreview()">
+    </div>
+    <div class="calc-preview" id="wth-preview">Enter values above</div>
+    <div class="input-group">
+      <label>Date</label>
+      <input type="date" id="wth-date" value="${dateKey()}" max="${dateKey()}">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-cancel" onclick="hideOverlay()">Cancel</button>
+      <button class="btn btn-red" id="wth-submit" onclick="submitCustomWithdrawal()" disabled>Confirm</button>
+    </div>`;
+  showOverlay();
+  document.getElementById('wth-name').focus();
+}
+
+function updateWithdrawalPreview(){
+  const cal=parseInt(document.getElementById('wth-cal').value)||0;
+  const preview=document.getElementById('wth-preview');
+  const submit=document.getElementById('wth-submit');
+  if(cal<=0){preview.innerHTML='Enter values above';submit.disabled=true;return;}
+  const blocks=(cal/CALS_PER_BLOCK).toFixed(1);
+  const swimLengths=Math.ceil(cal/SWIM_CAL_PER_LENGTH);
+  preview.innerHTML=`<div class="highlight" style="color:var(--red)">−${blocks} blocks</div><div class="rebuild">🏊 ${swimLengths} lengths rebuilds this</div>`;
+  submit.disabled=false;
+}
+
+function submitCustomWithdrawal(){
+  const name=document.getElementById('wth-name').value.trim()||'Custom';
+  const cal=parseInt(document.getElementById('wth-cal').value)||0;
+  const entryDate=document.getElementById('wth-date').value||dateKey();
+  if(cal<=0)return;
+  submitWithdrawal(name,cal,entryDate);
+}
+
+function submitWithdrawal(name,calories,entryDate){
+  entryDate=entryDate||dateKey();
+  const backdated=entryDate!==dateKey();
+  const entry={
+    id:genId(),type:'withdrawal',category:'treat',
+    label:name,rawCalories:calories,calories,
+    blocks:calories/CALS_PER_BLOCK,
+    date:entryDate,loggedAt:new Date().toISOString(),
+    backdated
+  };
+  data.entries.push(entry);
+  saveData();
+  hideOverlay();
+  const blocks=(calories/CALS_PER_BLOCK).toFixed(1);
+  showToast(`−${calories} cal (−${blocks} blocks)`);
+  renderCurrentTab();
+}
+
+/* ===== PRESETS ===== */
+function usePreset(id){
+  const preset=data.presets.find(p=>p.id===id);
+  if(!preset)return;
+  if(preset.type==='withdrawal'){
+    confirmWithdrawal(preset.name,preset.calories);
+  }else{
+    // Deposit preset - just log it directly
+    const entry={
+      id:genId(),type:'deposit',category:preset.category||'custom',
+      label:preset.name,rawCalories:preset.calories,calories:preset.calories,
+      blocks:preset.calories/CALS_PER_BLOCK,
+      date:dateKey(),loggedAt:new Date().toISOString(),backdated:false
+    };
+    data.entries.push(entry);
+    saveData();
+    checkCompletion();
+    showToast(`+${preset.calories} cal banked (+${(preset.calories/CALS_PER_BLOCK).toFixed(1)} blocks)`);
+    renderCurrentTab();
+  }
+}
+
+function showAddPreset(){
+  const card=document.getElementById('overlay-card');
+  card.innerHTML=`
+    <div class="overlay-title">New Preset</div>
+    <div class="input-group"><label>Name</label><input type="text" id="preset-name" placeholder="e.g. Twix"></div>
+    <div class="input-group"><label>Calories</label><input type="number" id="preset-cal" inputmode="numeric" placeholder="e.g. 250"></div>
+    <div class="input-group"><label>Type</label>
+      <select id="preset-type"><option value="withdrawal">Withdrawal (treat)</option><option value="deposit">Deposit (exercise)</option></select>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-cancel" onclick="hideOverlay()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewPreset()">Save</button>
+    </div>`;
+  showOverlay();
+}
+
+function saveNewPreset(){
+  const name=document.getElementById('preset-name').value.trim();
+  const cal=parseInt(document.getElementById('preset-cal').value)||0;
+  const type=document.getElementById('preset-type').value;
+  if(!name||cal<=0){showToast('Enter name and calories');return;}
+  data.presets.push({id:genId(),name,calories:cal,type,category:type==='deposit'?'custom':'treat'});
+  saveData();
+  hideOverlay();
+  showToast('Preset saved');
+  renderMoreTab();
+  renderLogTab();
+}
+
+function editPreset(id){
+  const preset=data.presets.find(p=>p.id===id);
+  if(!preset)return;
+  const card=document.getElementById('overlay-card');
+  card.innerHTML=`
+    <div class="overlay-title">Edit Preset</div>
+    <div class="input-group"><label>Name</label><input type="text" id="preset-name" value="${preset.name}"></div>
+    <div class="input-group"><label>Calories</label><input type="number" id="preset-cal" inputmode="numeric" value="${preset.calories}"></div>
+    <div class="input-group"><label>Type</label>
+      <select id="preset-type"><option value="withdrawal" ${preset.type==='withdrawal'?'selected':''}>Withdrawal</option><option value="deposit" ${preset.type==='deposit'?'selected':''}>Deposit</option></select>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-cancel" onclick="hideOverlay()">Cancel</button>
+      <button class="btn btn-primary" onclick="updatePreset('${id}')">Save</button>
+    </div>`;
+  showOverlay();
+}
+
+function updatePreset(id){
+  const preset=data.presets.find(p=>p.id===id);
+  if(!preset)return;
+  preset.name=document.getElementById('preset-name').value.trim()||preset.name;
+  preset.calories=parseInt(document.getElementById('preset-cal').value)||preset.calories;
+  preset.type=document.getElementById('preset-type').value;
+  saveData();
+  hideOverlay();
+  showToast('Preset updated (past entries unchanged)');
+  renderMoreTab();
+  renderLogTab();
+}
+
+function removePreset(id){
+  if(!confirm('Delete this preset?'))return;
+  data.presets=data.presets.filter(p=>p.id!==id);
+  saveData();
+  renderMoreTab();
+  renderLogTab();
+}
+
+/* ===== BEER ===== */
+function addBeer(){
+  const today=dateKey();
+  const now=new Date();
+  const monday=getMonday(now);
+  const mondayKey=dateKey(monday);
+  const weekCount=data.beerLog.filter(b=>b.date>=mondayKey&&b.date<=today).length;
+  const eveningCount=data.beerLog.filter(b=>b.date===today&&new Date(b.loggedAt).getHours()>=17).length;
+
+  if(weekCount>=7){showToast('Weekly limit reached (7)');return;}
+  if(now.getHours()>=17&&eveningCount>=3){showToast('Evening limit reached (3)');return;}
+
+  data.beerLog.push({id:genId(),date:today,loggedAt:now.toISOString()});
+  saveData();
+  renderBeerTab();
+  showToast('🍺 AF Beer logged');
+}
+
+/* ===== ENTRIES ===== */
+function deleteEntry(id){
+  const entry=data.entries.find(e=>e.id===id);
+  if(!entry)return;
+  if(!confirm(`Delete "${entry.label}" (${entry.calories} cal)?`))return;
+  entry.deleted=true;
+  entry.deletedAt=new Date().toISOString();
+  saveData();
+  showToast('Entry removed (trace kept)');
+  renderCurrentTab();
+}
+
+/* ===== MEMORY (completed stadiums) ===== */
+function editMemory(stadiumId){
+  const sd=data.stadiums[stadiumId];
+  const sConfig=STADIUMS.find(s=>s.id===stadiumId);
+  const card=document.getElementById('overlay-card');
+  card.innerHTML=`
+    <div class="overlay-title">${sConfig.emoji} ${sConfig.stadium} Memory</div>
+    <div class="input-group"><label>Match date</label><input type="date" id="mem-date" value="${sd.matchDate||''}"></div>
+    <div class="input-group"><label>Match details (teams, score)</label><input type="text" id="mem-details" value="${sd.matchDetails||''}" placeholder="e.g. Valencia 2-1 Deportivo"></div>
+    <div class="input-group"><label>Notes</label><textarea id="mem-notes" rows="3" style="width:100%;background:var(--surface2);border:1px solid var(--surface3);border-radius:var(--radius-sm);padding:10px;font-family:var(--font-body);font-size:14px;color:var(--text);resize:vertical">${sd.notes||''}</textarea></div>
+    <div class="btn-row">
+      <button class="btn btn-cancel" onclick="hideOverlay()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMemory('${stadiumId}')">Save</button>
+    </div>`;
+  showOverlay();
+}
+
+function saveMemory(stadiumId){
+  data.stadiums[stadiumId].matchDate=document.getElementById('mem-date').value;
+  data.stadiums[stadiumId].matchDetails=document.getElementById('mem-details').value.trim();
+  data.stadiums[stadiumId].notes=document.getElementById('mem-notes').value.trim();
+  saveData();
+  hideOverlay();
+  showToast('Memory saved');
+  renderMoreTab();
+}
+
+/* ===== OVERLAYS ===== */
+function showOverlay(){document.getElementById('overlay').classList.add('show')}
+function hideOverlay(){document.getElementById('overlay').classList.remove('show')}
+function showBackup(mode){
+  const card=document.getElementById('backup-card');
+  if(mode==='export'){
+    const code=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    card.innerHTML=`
+      <div class="overlay-title">Export Backup</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:8px">Copy this code and save it somewhere safe:</p>
+      <textarea class="code-area" id="export-code" readonly>${code}</textarea>
+      <div class="btn-row">
+        <button class="btn btn-cancel" onclick="hideBackup()">Close</button>
+        <button class="btn btn-primary" onclick="copyExport()">Copy</button>
+      </div>`;
+  }else{
+    card.innerHTML=`
+      <div class="overlay-title">Import Backup</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:8px">Paste your backup code below:</p>
+      <textarea class="code-area" id="import-code" placeholder="Paste code here"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-cancel" onclick="hideBackup()">Cancel</button>
+        <button class="btn btn-primary" onclick="doImport()">Import</button>
+      </div>`;
+  }
+  document.getElementById('backup-overlay').classList.add('show');
+}
+function hideBackup(){document.getElementById('backup-overlay').classList.remove('show')}
+function copyExport(){
+  const ta=document.getElementById('export-code');
+  ta.select();
+  try{navigator.clipboard.writeText(ta.value).then(()=>showToast('Copied!'))}
+  catch(e){document.execCommand('copy');showToast('Copied!')}
+}
+function doImport(){
+  const code=document.getElementById('import-code').value.trim();
+  if(!code){showToast('No code entered');return;}
+  try{
+    const decoded=JSON.parse(decodeURIComponent(escape(atob(code))));
+    if(!decoded.entries){throw new Error('Invalid data');}
+    data=decoded;
+    saveData();
+    hideBackup();
+    showToast('Data imported successfully');
+    renderCurrentTab();
+  }catch(e){showToast('Invalid backup code');}
+}
+
+/* ===== TOAST ===== */
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+/* ===== CELEBRATION ===== */
+function showCelebration(stadiumId){
+  const sConfig=STADIUMS.find(s=>s.id===stadiumId);
+  const cel=document.getElementById('celebration');
+  document.getElementById('celebration-text').innerHTML=`🏟️ ${sConfig.stadium.toUpperCase()}<br>COMPLETE!<br><span style="font-size:16px;color:var(--text2)">Book your trip to ${sConfig.city}!</span>`;
+  cel.classList.add('show');
+
+  // Confetti
+  const canvas=document.getElementById('confetti-canvas');
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  const colors=[sConfig.colors.primary,sConfig.colors.secondary,sConfig.colors.accent||'#FFD55A','#FFD55A'];
+  const particles=[];
+  for(let i=0;i<120;i++){
+    particles.push({
+      x:Math.random()*canvas.width,y:Math.random()*-canvas.height,
+      w:Math.random()*8+4,h:Math.random()*6+2,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      vx:(Math.random()-.5)*2,vy:Math.random()*3+2,
+      rot:Math.random()*360,vr:(Math.random()-.5)*8
+    });
+  }
+  let frame=0;
+  function drawConfetti(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;ctx.globalAlpha=Math.max(0,1-frame/180);
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    frame++;
+    if(frame<180)requestAnimationFrame(drawConfetti);
+    else{cel.classList.remove('show');ctx.clearRect(0,0,canvas.width,canvas.height);}
+  }
+  drawConfetti();
+}
+
+/* ===== INIT ===== */
+function init(){
+  loadData();
+  renderStadiumTab();
+  renderLogTab();
+
+  // Check for steps already entered today
+  const todaySteps=data.entries.find(e=>!e.deleted&&e.category==='steps'&&e.date===dateKey());
+  // Auto-view current stadium
+  const p=getStadiumProgress();
+  if(!data.stadiums[data.viewingStadium]||(!data.stadiums[data.viewingStadium].completed&&data.viewingStadium!==p.currentStadium)){
+    data.viewingStadium=p.currentStadium;
+    saveData();
+  }
+}
+
+init();
+</script>
+</body>
+</html>
